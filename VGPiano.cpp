@@ -8,9 +8,11 @@
 
 BOOL WINAPI consoleHandler(DWORD signal) {
 
-	if (signal == CTRL_C_EVENT)
+	if (signal == CTRL_C_EVENT) {
 		printf("Ctrl-C handled\n"); // do cleanup
-	exit(1);
+		system("pause");
+		exit(1);
+	}
 	return TRUE;
 }
 
