@@ -1,10 +1,11 @@
-﻿// VGPiano.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
+﻿// VGPiano.cpp
 //
 // #include "stdafx.h"
 #include <Windows.h>
 #include <iostream>
 #include <time.h> 
 #include <stdlib.h>
+#include <fstream>
 
 BOOL WINAPI consoleHandler(DWORD signal) {
 
@@ -16,8 +17,7 @@ BOOL WINAPI consoleHandler(DWORD signal) {
 	return TRUE;
 }
 
-bool presskey(WORD sym) {
-
+void presskey(WORD sym) {
 	INPUT ip;
 
 	// Set up a generic keyboard event.
@@ -34,8 +34,6 @@ bool presskey(WORD sym) {
 	// Release the "A" key
 	ip.ki.dwFlags = KEYEVENTF_KEYUP; // KEYEVENTF_KEYUP for key release
 	SendInput(1, &ip, sizeof(INPUT));
-
-	return true;
 }
 
 int main()
@@ -45,12 +43,12 @@ int main()
 		return 1;
 	}
 
-	const char* text =
-		"This text is pretty long, but will be "
-		"concatenated into just a single string. "
-		"The disadvantage is that you have to quote "
-		"each part, and newlines must be literal as "
-		"usual.";
+	std::ifstream in("input.txt");
+	std::string contents((std::istreambuf_iterator<char>(in)),
+		std::istreambuf_iterator<char>());
+
+	const char* text = contents.c_str();
+	std::cout << strlen(text);
 
 	srand(time(0));
 
@@ -58,10 +56,12 @@ int main()
 	int i = 0;
 	Sleep(5000);
 
-	while (true == presskey(VkKeyScanEx(text[i], currentKBL))) {
-		std::cout << (WORD)text[i] << text[i] <<"\n";
+	while (true) {
 		i += 1;
-		Sleep(100 + (rand() % 400));
+		if (10 == (WORD)text[i]) continue;
+		presskey(VkKeyScanEx(text[i], currentKBL));
+		std::cout << (WORD)text[i] << text[i] <<"\n";
+		Sleep(100 + (rand() % 800));
 	};
 
 	std::cout << "Hello World!\n";
